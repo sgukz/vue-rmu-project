@@ -23,6 +23,9 @@
       <v-btn icon @click="$router.push('/')">
         <v-icon color="light" dark>mdi-home</v-icon>
       </v-btn>
+      <div>
+        <v-btn depressed color="primary" @click="$router.push('/Administrator/main')"> สำหรับผู้ดูแลระบบ </v-btn>
+      </div>
     </v-app-bar>
     <v-sheet id="scrolling-techniques-3" class="overflow-y-auto">
       <v-container style="height: 1000px">
@@ -67,6 +70,10 @@ export default {
         reqeq5: [
           (v) => !!v || "Item is required",
           (v) => (v && v.length == 5) || "Must be 5 Digit",
+        ],
+        cid: [
+          (v) => !!v || "Item is required",
+          (v) => (v && v.length == 13) || "Must be 13 Digit",
         ],
       },
     };

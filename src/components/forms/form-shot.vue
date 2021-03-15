@@ -192,7 +192,7 @@
             <v-col cols="2" md="2">
               <v-text-field
                 v-model="form.recom_flat_aumphur"
-                label="เขต/อำเภอ  Canton"
+                label="เขต/อำเภอ Canton"
                 placeholder=" "
               ></v-text-field>
             </v-col>
@@ -232,7 +232,16 @@
         <br />
         <v-chip>**ผู้ให้ข้อมูล/ Informant**</v-chip>
         <v-row>
-          <v-col cols="6" sm="2" md="2">
+          <v-col cols="3" sm="3" md="3">
+            <v-text-field
+              v-model="form.cid"
+              :rules="rules.cid"
+              label="*เลขบัตรประชาชน/ CID*"
+              placeholder=" "
+              required
+            />
+          </v-col>
+          <v-col cols="3" sm="3" md="3">
             <v-text-field
               v-model="form.informant_pname"
               :rules="rules.req"
@@ -241,7 +250,7 @@
               required
             />
           </v-col>
-          <v-col cols="4" sm="6" md="4">
+          <v-col cols="3" sm="3" md="3">
             <v-text-field
               v-model="form.informant_fname"
               :rules="rules.name"
@@ -250,7 +259,16 @@
               required
             />
           </v-col>
-          <v-col cols="4" sm="6" md="4">
+          <v-col cols="3" sm="3" md="3">
+            <v-text-field
+              v-model="form.informant_lname"
+              :rules="rules.name"
+              label="*นามสกุล/Surname(TH)*"
+              placeholder=" "
+              required
+            />
+          </v-col>
+          <!-- <v-col cols="3" sm="3" md="3">
             <v-text-field
               v-model="form.informant_lname"
               :rules="rules.name"
@@ -258,17 +276,17 @@
               placeholder=""
               required
             />
-          </v-col>
-          <v-col cols="4" sm="1" md="2">
+          </v-col> -->
+        </v-row>
+        <v-row>
+          <v-col cols="3" sm="3" md="3">
             <v-text-field
               v-model="form.informant_nickname"
               label="ชื่อเล่น/Nickname(TH)"
               placeholder=" "
             />
           </v-col>
-        </v-row>
-        <v-row>
-          <v-col cols="12" sm="6" md="4">
+          <v-col cols="3" sm="3" md="3">
             <v-text-field
               prepend-icon="mdi-cellphone-iphone"
               v-model="form.informant_tel"
@@ -278,7 +296,7 @@
               required
             />
           </v-col>
-          <v-col cols="12" sm="6" md="4">
+          <v-col cols="3" sm="3" md="3">
             <v-text-field
               v-model="form.informant_email"
               :rules="rules.email"
@@ -287,7 +305,7 @@
               required
             />
           </v-col>
-          <v-col cols="12" sm="6" md="4">
+          <v-col cols="3" sm="3" md="3">
             <v-text-field
               v-model="form.informant_lineid"
               label="ID Line"
@@ -782,10 +800,11 @@
       <v-row>
         <v-spacer />
         <v-col cols="2">
-          <v-btn color="warning" v-if="!valid" @click="validate"
+          <!-- <v-btn color="warning" v-if="!valid" @click="validate"
             >Validate</v-btn
-          >
-          <v-btn color="success" v-else @click="save">Save</v-btn>
+          > -->
+          <v-btn color="success" v-if="!isData" @click="save">Save</v-btn>
+          <v-btn color="success" v-else @click="saveChang">Save change</v-btn>
         </v-col>
       </v-row>
     </v-container>
@@ -804,6 +823,7 @@ export default {
   data() {
     return {
       form: {
+        cid: "",
         company_name: "",
         company_house_number: "",
         company_building: "",
@@ -858,7 +878,7 @@ export default {
         experience_resign_note_3: "",
         signature: "",
       },
-
+      isData: false,
       modal_period: false,
       date: new Date().toISOString().substr(0, 7),
       modal_period2: false,
@@ -884,11 +904,122 @@ export default {
     };
   },
   mounted() {
-    // this.init();
+    let isIdUpdate = localStorage.getItem("isAdminUpdate");
+    if (isIdUpdate) {
+      this.loadData(isIdUpdate);
+    }
   },
   methods: {
     validate() {
       this.$refs.form.validate();
+    },
+    loadData(cid) {
+      let baseUrl = process.env.VUE_APP_DATA;
+      axios
+        .get(`${baseUrl}/getGraduateDataByCID/${cid}`)
+        .then((resp) => {
+          let data = resp.data.data;
+          if (data.length > 0) {
+            this.isData = true;
+            this.form.cid = data[0].cid;
+            this.form.company_name = data[0].company_name;
+            this.form.company_house_number = data[0].company_house_number;
+            this.form.company_building = data[0].company_building;
+            this.form.company_alley = data[0].company_alley;
+            this.form.company_street = data[0].company_street;
+            this.form.company_district = data[0].company_district;
+            this.form.company_aumphur = data[0].company_aumphur;
+            this.form.company_province = data[0].company_province;
+            this.form.company_country = data[0].company_country;
+            this.form.company_postcode = data[0].company_postcode;
+            this.form.company_telephone = data[0].company_telephone;
+            this.form.company_allowance = data[0].company_allowance;
+            this.form.not_recom_room = data[0].not_recom_room;
+            this.form.recom_flat_house_number = data[0].recom_flat_house_number;
+            this.form.recom_flat_building = data[0].recom_flat_building;
+            this.form.recom_flat_alley = data[0].recom_flat_alley;
+            this.form.recom_flat_street = data[0].recom_flat_street;
+            this.form.recom_flat_district = data[0].recom_flat_district;
+            this.form.recom_flat_aumphur = data[0].recom_flat_aumphur;
+            this.form.recom_flat_province = data[0].recom_flat_province;
+            this.form.recom_flat_country = data[0].recom_flat_country;
+            this.form.recom_flat_postaicode = data[0].recom_flat_postaicode;
+            this.form.recom_flat_telephone = data[0].recom_flat_telephone;
+            this.form.informant_pname = data[0].informant_pname;
+            this.form.informant_fname = data[0].informant_fname;
+            this.form.informant_lname = data[0].informant_lname;
+            this.form.informant_nickname = data[0].informant_nickname;
+            this.form.informant_tel = data[0].informant_tel;
+            this.form.informant_email = data[0].informant_email;
+            this.form.informant_lineid = data[0].informant_lineid;
+            this.form.not_experience = data[0].not_experience;
+            this.form.experience_company = data[0].experience_company;
+            this.form.experience_company_period_from =
+              data[0].experience_company_period_from;
+            this.form.experience_company_period_to =
+              data[0].experience_company_period_to;
+            this.form.experience_company_period_total =
+              data[0].experience_company_period_total;
+            this.form.experience_position = data[0].experience_position;
+            this.form.experience_salary = data[0].experience_salary;
+            this.form.experience_resign_note = data[0].experience_resign_note;
+            this.form.experience_company_2 = data[0].experience_company_2;
+            this.form.experience_company_period_from_2 =
+              data[0].experience_company_period_from_2;
+            this.form.experience_company_period_to_2 =
+              data[0].experience_company_period_to_2;
+            this.form.experience_company_period_total_2 =
+              data[0].experience_company_period_total_2;
+            this.form.experience_position_2 = data[0].experience_position_2;
+            this.form.experience_salary_2 = data[0].experience_salary_2;
+            this.form.experience_resign_note_2 =
+              data[0].experience_resign_note_2;
+            this.form.experience_company_3 = data[0].experience_company_3;
+            this.form.experience_company_period_from_3 =
+              data[0].experience_company_period_from_3;
+            this.form.experience_company_period_to_3 =
+              data[0].experience_company_period_to_3;
+            this.form.experience_company_period_total_3 =
+              data[0].experience_company_period_total_3;
+            this.form.experience_position_3 = data[0].experience_position_3;
+            this.form.experience_salary_3 = data[0].experience_salary_3;
+            this.form.experience_resign_note_3 =
+              data[0].experience_resign_note_3;
+            this.form.signature = data[0].signature;
+          }
+        })
+        .catch((error) => console.log("Error :", error));
+    },
+    saveChang() {
+      let baseUrl = process.env.VUE_APP_DATA;
+      let formData = this.form;
+      axios
+        .post(`${baseUrl}/saveDataChange`, {
+          register: formData,
+        })
+        .then((res) => {
+          let data = res.data;
+          if (data.status_code === 200) {
+            this.$swal({
+              title: "บันทึกการเปลี่ยนแปลงข้อมูลแล้ว",
+              text: "ข้อมูลของท่านจะเป็นประโยชน์ต่อน้องๆรุ่นถัดไป",
+              type: "success",
+              showCancelButton: false,
+              confirmButtonText: "OK",
+              showCloseButton: true,
+            }).then((result) => {
+              if (result.value) {
+                let id = data.id;
+                this.loadData(id);
+              }
+            });
+          } else {
+            this.$swal("เกิดข้อผิดพลาด", data.msg, data.type);
+          }
+        })
+        .catch((error) => {
+          this.$swal("เกิดข้อผิดพลาด", "Error" + error, "error");
+        });
     },
     save() {
       let baseUrl = process.env.VUE_APP_DATA;
@@ -899,9 +1030,27 @@ export default {
         })
         .then((res) => {
           let data = res.data;
-          console.log(data);
+          if (data.status_code === 200) {
+            this.$swal({
+              title: "บันทึกข้อมูลเรียบร้อย",
+              text: "ข้อมูลของท่านจะเป็นประโยชน์ต่อน้องๆรุ่นถัดไป",
+              type: "success",
+              showCancelButton: false,
+              confirmButtonText: "OK",
+              showCloseButton: true,
+            }).then((result) => {
+              if (result.value) {
+                let id = data.id;
+                this.loadData(id);
+              }
+            });
+          } else {
+            this.$swal("เกิดข้อผิดพลาด", data.msg, data.type);
+          }
         })
-        .catch((error) => console.log("Error :", error));
+        .catch((error) => {
+          this.$swal("เกิดข้อผิดพลาด", "Error" + error, "error");
+        });
     },
   },
   computed: {

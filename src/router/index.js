@@ -1,9 +1,10 @@
 import Vue from 'vue'
 import VueRouter from 'vue-router'
 import shotform from '@/views/forms/shot.vue'
-import fullform from '@/views/forms/full.vue'
+// import fullform from '@/views/forms/full.vue'
 import welcome from '@/views/welcome'
-
+import login from '@/views/LoginAdmin'
+import mainAdmin from '@/views/ShowDataAdmin'
 
 Vue.use(VueRouter)
 
@@ -19,9 +20,14 @@ const routes = [
     component: shotform
   },
   {
-    path: '/full',
-    name: 'full-form',
-    component: fullform
+    path: '/Administrator/login',
+    name: 'login-admin',
+    component: login
+  },
+  {
+    path: '/Administrator/main',
+    name: 'main-admin',
+    component: mainAdmin
   }
 ]
 
