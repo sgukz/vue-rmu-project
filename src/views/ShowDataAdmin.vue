@@ -25,10 +25,10 @@
       <div>
         <v-btn
           depressed
-          color="error"
-          @click="logout"
+          color="primary"
+          @click="$router.push('/Administrator/login')"
         >
-          ออกจากระบบ
+          สำหรับผู้ดูแลระบบ
         </v-btn>
       </div>
     </v-app-bar>
@@ -54,12 +54,19 @@
               class="elevation-1"
             >
               <template v-slot:item.actions="{ item }">
-                <v-icon small class="mr-2" @click="editItem(item.cid)">
-                  mdi-pencil
-                </v-icon>
-                <v-icon small @click="deleteItem(item.cid)">
-                  mdi-delete
-                </v-icon>
+                <div v-if="isAdmin">
+                  <v-icon small class="mr-2" @click="editItem(item.cid)">
+                    mdi-pencil
+                  </v-icon>
+                  <v-icon small @click="deleteItem(item.cid)">
+                    mdi-delete
+                  </v-icon>
+                </div>
+                <div v-else>
+                <v-icon small @click="viewData(item.cid)">
+                    mdi-eye
+                  </v-icon>
+                </div>
               </template>
             </v-data-table>
           </div>
@@ -79,8 +86,9 @@ export default {
   name: "MainAdmin",
   data() {
     return {
-      appTitle: "Administrator",
+      appTitle: "ระบบการจัดเก็บข้อมูลการทำงานของนักศึกษา",
       sidebar: false,
+      isAdmin: false,
       search: "",
       desserts: [],
       headers: [
@@ -98,8 +106,8 @@ export default {
   },
   mounted() {
     let isLogin = localStorage.getItem("isLogin");
-    if (!isLogin) {
-      window.location = "/Administrator/login";
+    if (isLogin) {
+      this.isAdmin = true
     }
     this.loadData();
   },
@@ -118,6 +126,11 @@ export default {
     },
     editItem(id) {
       localStorage.setItem("isAdminUpdate", id);
+      window.location = "/shot-form";
+    },
+    viewData(id){
+      localStorage.setItem("isAdminUpdate", id);
+      localStorage.setItem("isViewer", true);
       window.location = "/shot-form";
     },
     deleteItem(id) {
@@ -148,11 +161,11 @@ export default {
         }
       });
     },
-    logout(){
-        localStorage.removeItem("isLogin")
-        localStorage.removeItem("isAdminUpdate")
-        window.location = "/Administrator/login";
-    }
+    logout() {
+      localStorage.removeItem("isLogin");
+      localStorage.removeItem("isAdminUpdate");
+      window.location = "/Administrator/login";
+    },
   },
 };
 </script>

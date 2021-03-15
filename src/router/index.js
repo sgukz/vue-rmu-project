@@ -5,6 +5,7 @@ import shotform from '@/views/forms/shot.vue'
 import welcome from '@/views/welcome'
 import login from '@/views/LoginAdmin'
 import mainAdmin from '@/views/ShowDataAdmin'
+import googleMap from '@/views/GoogleMap'
 
 Vue.use(VueRouter)
 
@@ -25,9 +26,14 @@ const routes = [
     component: login
   },
   {
-    path: '/Administrator/main',
+    path: '/COE/main',
     name: 'main-admin',
     component: mainAdmin
+  },
+  {
+    path: '/google-map',
+    name: 'map',
+    component: googleMap
   }
 ]
 

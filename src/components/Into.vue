@@ -44,6 +44,7 @@ export default {
                 let data = resp.data.data;
                 if (data.length > 0) {
                   localStorage.setItem("isAdminUpdate", data[0].cid);
+                  localStorage.removeItem("isViewer");
                   window.location = "/shot-form";
                 }else{
                   this.$swal("แจ้งเตือน", "ไม่พบข้อมูล!", "error");

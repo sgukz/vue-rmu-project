@@ -16,7 +16,7 @@
           gradient="to top right, rgba(213, 209, 209,.1), rgba(213, 209, 209,.4)"
         ></v-img>
       </template>
-      <v-app-bar-title>COE. Management</v-app-bar-title>
+      <v-app-bar-title style="cursor: pointer;" @click="$router.push('/')">COE. Management</v-app-bar-title>
 
       <v-spacer></v-spacer>
 
@@ -24,7 +24,7 @@
         <v-icon color="light" dark>mdi-home</v-icon>
       </v-btn>
       <div>
-        <v-btn depressed color="primary" @click="$router.push('/Administrator/main')"> สำหรับผู้ดูแลระบบ </v-btn>
+        <v-btn depressed color="primary" @click="$router.push('/COE/main')"> ดูข้อมูลทั้งหมด </v-btn>
       </div>
     </v-app-bar>
     <v-sheet id="scrolling-techniques-3" class="overflow-y-auto">
