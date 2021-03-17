@@ -9,9 +9,10 @@
       <a href="/shot-form" class="btn-get-started scrollto mb-4"
         >กรอกข้อมูลการทำงาน</a
       >
-      <a href="#" class="btn-get-started scrollto" @click="openModal"
+      <a href="#" class="btn-get-started scrollto mb-4" @click="openModal"
         >ตรวจสอบข้อมูล</a
       >
+      <a href="/COE/main" class="btn-get-started scrollto">ดูข้อมูลทั้งหมด</a>
     </div>
   </section>
 </template>
@@ -46,7 +47,7 @@ export default {
                   localStorage.setItem("isAdminUpdate", data[0].cid);
                   localStorage.removeItem("isViewer");
                   window.location = "/shot-form";
-                }else{
+                } else {
                   this.$swal("แจ้งเตือน", "ไม่พบข้อมูล!", "error");
                 }
               })

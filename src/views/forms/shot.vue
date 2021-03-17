@@ -20,12 +20,15 @@
 
       <v-spacer></v-spacer>
 
-      <v-btn icon @click="$router.push('/')">
+      <v-btn class="mr-2" depressed @click="$router.push('/')">
         <v-icon color="light" dark>mdi-home</v-icon>
       </v-btn>
-      <div>
-        <v-btn depressed color="primary" @click="$router.push('/COE/main')"> ดูข้อมูลทั้งหมด </v-btn>
-      </div>
+      <v-btn class="mr-2" color="primary" depressed @click="$router.push('/COE/main')">
+        ดูข้อมูลทั้งหมด
+      </v-btn>
+      <!-- <div>
+        <v-btn depressed color="primary" > ดูข้อมูลทั้งหมด </v-btn>
+      </div> -->
     </v-app-bar>
     <v-sheet id="scrolling-techniques-3" class="overflow-y-auto">
       <v-container style="height: 1000px">
@@ -48,7 +51,6 @@ export default {
   data() {
     return {
       data: {},
-
       formshot_rules: {
         req: [(v) => !!v || "Item is required"],
         name: [

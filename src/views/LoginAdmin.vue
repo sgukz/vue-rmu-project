@@ -6,7 +6,7 @@
           <v-flex xs12 sm8 md4>
             <v-card class="elevation-12">
               <v-toolbar dark color="primary">
-                <v-toolbar-title> Login Administrator </v-toolbar-title>
+                <v-toolbar-title> Login COE. Management</v-toolbar-title>
               </v-toolbar>
               <v-card-text>
                 <v-form ref="form" v-model="valid">
@@ -53,27 +53,48 @@ export default {
     loginNameRule: [(v) => !!v || "Item is required"],
     show1: false,
   }),
+  mounted() {
+    // localStorage.clear();
+    let login = localStorage.getItem("login");
+    if (login) {
+      setTimeout(() => {
+        window.location = "/COE/main";
+      }, 1500);
+    } else {
+      localStorage.clear();
+    }
+  },
   methods: {
     login() {
       let baseUrl = process.env.VUE_APP_DATA;
-      let formLogin = {
+      let dataLogin = {
         username: this.loginName,
         pwd: this.loginPassword,
       };
       axios
         .post(`${baseUrl}/login`, {
-          formLogin: formLogin,
+          formLogin: dataLogin,
         })
         .then((res) => {
           let data = res.data;
           if (data.status_code === 200) {
-            this.$swal("แจ้งเตือน", data.msg, data.type);
-            localStorage.setItem("isLogin", true);
-            setTimeout(() => {
-              window.location = "/Administrator/main"
-            }, 1500);
-          } else {
-            this.$swal("แจ้งเตือน", data.msg, data.type);
+            this.$swal({
+              title: "แจ้งเตือน",
+              text: data.msg,
+              type: data.type,
+              showConfirmButton: false,
+            });
+            if (data.data.length > 0) {
+              localStorage.setItem("login", JSON.stringify(data.data));
+              setTimeout(() => {
+                window.location = "/COE/main";
+              }, 1500);
+            } else {
+              this.$swal("แจ้งเตือน", "Login fail!!!", "warning");
+              this.loginPassword = "";
+            }
+          } else if (data.status_code === 400) {
+            this.$swal("เกิดข้อผิดพลาด", data.msg, data.type);
             this.loginPassword = "";
           }
         })

@@ -21,7 +21,7 @@ const routes = [
     component: shotform
   },
   {
-    path: '/Administrator/login',
+    path: '/COE/login',
     name: 'login-admin',
     component: login
   },

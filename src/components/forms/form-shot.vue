@@ -19,6 +19,7 @@
       </p>
     </div>
     <v-container fluid>
+      {{ this.form.user_regis }}
       <!-- <v-form ref="form" v-model="valid"> -->
       <v-chip class="ma-2">** ข้อมูลของบริษัท/ Information Company **</v-chip>
       <v-row>
@@ -131,24 +132,33 @@
           <v-subheader>
             <p class="font-weight-black">ค้นหาตำแหน่งที่ตั้งบริษัท</p>
           </v-subheader>
-          <!-- {{ this.form.company_location }} -->
+          
           <div>
             <label>
               <gmap-autocomplete @place_changed="setPlace"> </gmap-autocomplete>
-              <button @click="addMarker">Add</button>
+              <v-btn @click="addMarker" color="primary" class="ml-3">Add</v-btn>
             </label>
           </div>
+
+          <v-text-field
+            v-model="currentLocation"
+            label="ระบุ latitude และ longitude"
+            placeholder=" "
+          ></v-text-field>
+        <strong class="text-danger">ระบุ latitude และ longitude กรณีค้นหาสถานที่ไม่เจอ รูปแบบดังนี้ 16.2004057, 103.2693694</strong> <br>
           <br />
+          <h6>{{ this.form.company_location_label }}</h6>
           <gmap-map
             :center="center"
-            :zoom="12"
+            :zoom="15"
             style="width: 100%; height: 400px"
           >
             <gmap-marker
               :key="index"
               v-for="(m, index) in markers"
               :position="m.position"
-              @click="center = m.position"
+              :label="m.label"
+              @click="goToMap(m.url)"
             ></gmap-marker>
           </gmap-map>
         </v-col>
@@ -845,6 +855,7 @@ export default {
         company_telephone: "",
         company_allowance: "",
         company_location: "",
+        company_location_label: "",
         not_recom_room: "",
         recom_flat_house_number: "",
         recom_flat_building: "",
@@ -886,6 +897,7 @@ export default {
         experience_salary_3: "",
         experience_resign_note_3: "",
         signature: "",
+        user_regis: "",
       },
       isData: false,
       modal_period: false,
@@ -910,30 +922,64 @@ export default {
       ],
       //
       menu3: false,
-      center: { lat: 45.508, lng: -73.587 },
+      center: { lat: 16.2004057, lng: 103.2693694 },
       markers: [],
       places: [],
       currentPlace: null,
       isViewer: false,
+      isRight: "",
+      userName: "",
+      currentLocation: "",
     };
   },
   mounted() {
+    let login = localStorage.getItem("login");
     let isIdUpdate = localStorage.getItem("isAdminUpdate");
     let isViewer = localStorage.getItem("isViewer");
-    if (isIdUpdate) {
-      if (isViewer) {
-        this.isViewer = true;
-      } else {
-        localStorage.removeItem("isViewer");
-        this.isViewer = false;
+    if (!login) {
+      this.$swal({
+        title: "แจ้งเตือน",
+        text: "กรุณาล็อคอินเข้าใช้งานระบบ",
+        type: "warning",
+        showConfirmButton: false,
+      });
+      setTimeout(() => {
+        window.location = "/COE/login";
+      }, 1500);
+    } else {
+      let dataUser = JSON.parse(login);
+      this.userName = dataUser[0].user_name;
+      this.isRight = dataUser[0].right;
+      if (isIdUpdate) {
+        if (isViewer) {
+          this.isViewer = true;
+        } else {
+          localStorage.removeItem("isViewer");
+          this.isViewer = false;
+        }
+        this.loadData(isIdUpdate);
       }
-      this.loadData(isIdUpdate);
     }
-    this.geolocate();
+    // if (isIdUpdate) {
+    //   if (isViewer) {
+    //     this.isViewer = true;
+    //   } else {
+    //     localStorage.removeItem("isViewer");
+    //     this.isViewer = false;
+    //   }
+    //   this.loadData(isIdUpdate);
+    // }
+    // this.geolocate();
   },
   methods: {
     validate() {
       this.$refs.form.validate();
+    },
+    goToMap(url) {
+      window.open(
+        url,
+        "_blank" // <- This is what makes it open in a new window.
+      );
     },
     loadData(cid) {
       let baseUrl = process.env.VUE_APP_DATA;
@@ -1008,10 +1054,22 @@ export default {
             this.form.experience_resign_note_3 =
               data[0].experience_resign_note_3;
             this.form.signature = data[0].signature;
-
+            this.form.user_regis =
+              data[0].user_regis === null ? this.userName : data[0].user_regis;
             this.form.company_location = data[0].company_location;
+            this.form.company_location_label = data[0].company_location_label;
+            if(data[0].company_location_label === "" || data[0].company_location_label === null){
+              let dataLocation = JSON.parse(data[0].company_location)
+              this.currentLocation = dataLocation.lat+", "+dataLocation.lng
+            }
             this.markers.push({
               position: JSON.parse(data[0].company_location),
+              label: {
+                color: "black",
+                fontWeight: "bold",
+                text: (data[0].company_location_label ==="" || data[0].company_location_label ===null) ? "." : data[0].company_location_label,
+              },
+              url: JSON.parse(data[0].company_location_url),
             });
             this.places.push(this.currentPlace);
             this.center = JSON.parse(data[0].company_location);
@@ -1021,6 +1079,14 @@ export default {
         .catch((error) => console.log("Error :", error));
     },
     saveChang() {
+      if (this.currentLocation !== "") {
+        let strLocation = this.currentLocation.split(",");
+        let jsonLocation = {
+          lat: parseFloat(strLocation[0].trim()),
+          lng: parseFloat(strLocation[1].trim()),
+        };
+        this.form.company_location = JSON.stringify(jsonLocation);
+      }
       let baseUrl = process.env.VUE_APP_DATA;
       let formData = this.form;
       axios
@@ -1055,6 +1121,14 @@ export default {
       if (this.form.cid === "" || this.form.company_name === "") {
         this.$swal("แจ้งเตือน", "กรุณากรอกข้อมูลให้ครบ", "warning");
       } else {
+        if (this.currentLocation !== "") {
+          let strLocation = this.currentLocation.split(",");
+          let jsonLocation = {
+            lat: parseFloat(strLocation[0].trim()),
+          lng: parseFloat(strLocation[1].trim()),
+          };
+          this.form.company_location = JSON.stringify(jsonLocation);
+        }
         let baseUrl = process.env.VUE_APP_DATA;
         let formData = this.form;
         axios
@@ -1088,6 +1162,7 @@ export default {
     },
     setPlace(place) {
       this.currentPlace = place;
+      console.log(place);
     },
     addMarker() {
       if (this.currentPlace) {
@@ -1095,8 +1170,18 @@ export default {
           lat: this.currentPlace.geometry.location.lat(),
           lng: this.currentPlace.geometry.location.lng(),
         };
+        this.form.company_location_label = this.currentPlace.name;
+        this.form.company_location_url = JSON.stringify(this.currentPlace.url);
         this.form.company_location = JSON.stringify(marker);
-        this.markers.push({ position: marker });
+        this.markers.push({
+          position: marker,
+          label: {
+            color: "black",
+            fontWeight: "bold",
+            text: this.currentPlace.name,
+          },
+          url: this.currentPlace.url,
+        });
         this.places.push(this.currentPlace);
         this.center = marker;
         this.currentPlace = null;

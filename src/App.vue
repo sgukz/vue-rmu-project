@@ -11,6 +11,8 @@ export default {
     drawer: false,
     
   }),
+  mounted(){
+  }
 };
 </script>
 <style>
